@@ -1,0 +1,28 @@
+services:
+  postgres_db:
+    image: postgres:17
+    container_name: manufacturing_analytics_db
+    environment:
+      POSTGRES_DB: manufacturing_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  daily_aggregator_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: daily_aggregator_processor
+    depends_on:
+      - postgres_db
+    volumes:
+      - ./raw_data:/data/raw
+    environment:
+      DB_HOST: postgres_db
+      DB_NAME: manufacturing_db
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      
+volumes:
+  postgres_data:

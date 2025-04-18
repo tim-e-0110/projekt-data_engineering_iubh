@@ -33,11 +33,11 @@ AS_Blow_error_range = (350.0, 449.99)
 PP_Blow_ok_range = (450.0, 550.0)
 PP_Blow_error_range = (350.0, 449.99)
 
-delta1 = (190, 210)
+delta1 = (130, 150)
 delta2 = (95, 105)
-delta3 = (95, 105)
-delta4 = (290, 310)
-
+delta3 = (50, 55)
+delta4 = (220, 250)
+delta5 = (80, 100)
 
 
 output_filename = f"machine_event_logs_{MACHINE_ID}_{StartZeit.strftime('%Y-%m-%d_%H-%M')}_to_{EndeZeit.strftime('%Y-%m-%d_%H-%M')}.csv"
@@ -59,21 +59,26 @@ with open(output_filepath, 'w', newline='') as csvfile:
     Datenzeilen_counter=0
     
     while Simulationszeit_aktuell <= EndeZeit:
+        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Cycle_Start", None, None])
+        Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta1)) # PP fährt zur Abholposition
+        
         writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "AS_Check", "AS_VacuumUnits", round(random.uniform(*(AS_Vacuum_error_range if random.random() <= fehlerRate else AS_Vacuum_ok_range)),2)])
-        Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta1))
+        Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta2)) # Ausstechen und Pickup-Verzögerung
         
         writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Pick_Check", "PP_VacuumUnits", round(random.uniform(*(PP_Vacuum_error_range if random.random() <= fehlerRate else PP_Vacuum_ok_range)),2)])
         writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Pick_Check", "PP_Force", round(random.uniform(*(Pick_Force_error_range if random.random() <= fehlerRate else Pick_Force_ok_range)), 2)])
-        Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta2))
+        Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta3)) # Maschinenverzögerung zw. Pickup und AS-BlowOff
         
         writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "AS_Blowoff_Check", "AS_VacuumUnits", round(random.uniform(*(AS_Blow_error_range if random.random() <= fehlerRate else AS_Blow_ok_range)), 2)])
-        Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta3))
+        Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta4)) # PP fährt zur Bestückposition
         
         writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Place_Check", "PP_Force", round(random.uniform(*(Place_Force_error_range if random.random() <= fehlerRate else Place_Force_ok_range)), 2)])
         writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Place_Check", "PP_VacuumUnits", round(random.uniform(*(PP_Blow_error_range if random.random() <= fehlerRate else PP_Blow_ok_range)), 2)])
-        Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta4))
-        Datenzeilen_counter+=6
-        # Fortschrittsanzeige
+        Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta5)) # Bauteilsuche/Fahrt zur Warteposition
+        
+        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Cycle_End", None, None])
+        Datenzeilen_counter+=8
+        
         Fortschritt_abs = (Simulationszeit_aktuell - StartZeit).total_seconds()
         Fortschritt_rel = int((Fortschritt_abs / GesamtDauer) * 100)
         if Fortschritt_rel // 10 > Prozentanzeige // 10:

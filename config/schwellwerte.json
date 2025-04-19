@@ -1,0 +1,26 @@
+{
+  "AS_VacuumUnits": {
+    "error_if_above": 70.0,
+    "_comment": "AS Vakuum bei ASCheck sollte niedrig sein <= 70"
+  },
+  "PP_VacuumUnits": {
+    "error_if_above": 75.0,
+     "_comment": "PP Vakuum bei PickCheck sollte niedrig sein <= 75"
+  },
+  "AS_VakuumUnits_Release": {
+    "error_if_below": 450.0,
+    "_comment": "AS Vakuum bei AS_BlowoffCheck sollte hoch sein >= 450"
+  },
+  "PP_VacuumUnits_Release": {
+     "error_if_below": 450.0,
+     "_comment": "PP Vakuum bei PlaceCheck sollte hoch sein >= 450"
+  },
+  "PickForce": {
+    "error_if_outside_range": [60.0, 120.0],
+    "_comment": "Pick Kraft sollte zwischen 60 und 120 liegen"
+  },
+  "PlaceForce": {
+    "error_if_outside_range": [60.0, 120.0],
+     "_comment": "Place Kraft sollte zwischen 60 und 120 liegen"
+  }
+}

@@ -7,7 +7,7 @@
     "error_if_above": 75.0,
      "_comment": "PP Vakuum bei PickCheck sollte niedrig sein <= 75"
   },
-  "AS_VakuumUnits_Release": {
+  "AS_VacuumUnits_Release": {
     "error_if_below": 450.0,
     "_comment": "AS Vakuum bei AS_BlowoffCheck sollte hoch sein >= 450"
   },

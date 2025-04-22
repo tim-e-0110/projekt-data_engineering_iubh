@@ -5,7 +5,7 @@ import csv
 import os
 
 MACHINE_ID = "DieBonder_01"
-SimDauer = 1*24     # Angabe in Stunden.
+SimDauer = 1*24    # Angabe in Stunden.
 
 StartZeit_STR = "2024-10-16T00:00"
 
@@ -20,8 +20,8 @@ EndeZeit = StartZeit + datetime.timedelta(hours=SimDauer)
 
 fehlerRate = 0.01
 
-AS_Vacuum_ok_range = (40.0,80.0)
-AS_Vacuum_error_range = (80.1, 100.0)
+AS_Vacuum_ok_range = (40.0,70.0)
+AS_Vacuum_error_range = (70.1, 100.0)
 PP_Vacuum_ok_range = (50.0, 75.0)
 PP_Vacuum_error_range = (75.01, 120)
 Pick_Force_ok_range = (60.0, 120.0)
@@ -58,7 +58,7 @@ with open(output_filepath, 'w', newline='') as csvfile:
     Prozentanzeige = -1
     Datenzeilen_counter=0
     
-    while Simulationszeit_aktuell <= EndeZeit:
+    while Simulationszeit_aktuell < EndeZeit:
         writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Cycle_Start", None, None])
         Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta1)) # PP fährt zur Abholposition
         

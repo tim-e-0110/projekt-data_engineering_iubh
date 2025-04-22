@@ -22,6 +22,7 @@ services:
     volumes:
       - ./raw_data:/data/raw
       - ./config:/app/config:ro
+      - ./drivers:/app/drivers
     environment:
       DB_HOST: postgres_db
       DB_NAME: manufacturing_db

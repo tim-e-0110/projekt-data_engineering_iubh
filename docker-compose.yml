@@ -28,6 +28,21 @@ services:
       DB_NAME: manufacturing_db
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
-      
+     
+  dashboard_service:
+    build:
+      context: .
+      dockerfile: Dockerfile_dash
+    container_name: manufacturing_dashboard
+    depends_on:
+      - postgres_db
+    ports:
+      - "8501:8501"
+    environment:
+      DB_HOST: postgres_db
+      DB_NAME: manufacturing_db
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+
 volumes:
   postgres_data:

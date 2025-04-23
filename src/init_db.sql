@@ -7,10 +7,10 @@ CREATE TABLE processed_machine_events (
     machine_id VARCHAR(50) NOT NULL,
     event_name VARCHAR(50) NOT NULL,
     parameter_name VARCHAR(50) NULL,
-    value FLOAT NULL,
+    value NUMERIC(7, 2) NULL,
     is_error INT CHECK (is_error IN (0, 1)) NOT NULL,
     cycle_seq BIGINT NOT NULL,
-	cycle_time_seconds FLOAT NULL
+    cycle_time_seconds NUMERIC(10, 3) NULL
 );
 
 -- Indizes
@@ -22,12 +22,12 @@ CREATE TABLE hourly_machine_summary (
     summary_date DATE NOT NULL,
     hour_of_day INT NOT NULL CHECK (hour_of_day >= 0 AND hour_of_day <= 23),
     machine_id VARCHAR(50) NOT NULL,
-    avg_pick_force FLOAT,
-    max_pick_force FLOAT,
-	min_pick_force FLOAT,
-    avg_place_force FLOAT,
-    max_place_force FLOAT,
-	min_place_force FLOAT,
+    avg_pick_force NUMERIC(7, 2),
+    max_pick_force NUMERIC(7, 2),
+    min_pick_force NUMERIC(7, 2),
+    avg_place_force NUMERIC(7, 2),
+    max_place_force NUMERIC(7, 2),
+    min_place_force NUMERIC(7, 2),
     as_vacuum_error_count INT,
     pp_vacuum_error_count INT,
     as_release_error_count INT,
@@ -35,7 +35,9 @@ CREATE TABLE hourly_machine_summary (
     pick_force_error_count INT,
     place_force_error_count INT,
     cycle_count INT,
-    avg_cycle_time_seconds FLOAT,
+    min_cycle_time_seconds NUMERIC(10, 3),
+	max_cycle_time_seconds NUMERIC(10, 3),
+	avg_cycle_time_seconds NUMERIC(10, 3),
     PRIMARY KEY (summary_date, hour_of_day, machine_id)
 );
 

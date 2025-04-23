@@ -1,3 +1,4 @@
+import sys
 import datetime
 from datetime import timedelta
 import random
@@ -7,18 +8,28 @@ import os
 MACHINE_ID = "DieBonder_01"
 SimDauer = 1*24    # Angabe in Stunden.
 
-StartZeit_STR = "2024-10-16T00:00"
+if len(sys.argv) != 2:
+    print("Benutzung: python generate_data.py <Startdatum im Format YYYY-MM-DD>")
+    sys.exit(1)
+
+datum_input = sys.argv[1]
+StartZeit_STR = datum_input + "T00:00"
 
 try:
     dt_naive = datetime.datetime.strptime(StartZeit_STR, "%Y-%m-%dT%H:%M")
 except ValueError:
-    print(f"Fehler: Ungültiges Datums-/Zeitformat '{StartZeit_STR}'. Erwartet z. B. YYYY-MM-DDTHH:MM")
+    print(f"Fehler: Ungültiges Datumsformat '{datum_input}'. Erwartet z. B. 2024-10-16")
     sys.exit(1)
     
 StartZeit = dt_naive.replace(second=0, microsecond=0, tzinfo=datetime.UTC)
 EndeZeit = StartZeit + datetime.timedelta(hours=SimDauer)
 
-fehlerRate = 0.01
+fehlerRate_AS_Vacuum = 0.01
+fehlerRate_PP_Vacuum = 0.02
+fehlerRate_AS_Blow = 0.01
+fehlerRate_PP_Blow = 0.01
+fehlerRate_Pick_Force = 0.01
+fehlerRate_Place_Force = 0.01
 
 AS_Vacuum_ok_range = (40.0,70.0)
 AS_Vacuum_error_range = (70.1, 100.0)
@@ -62,18 +73,18 @@ with open(output_filepath, 'w', newline='') as csvfile:
         writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Cycle_Start", None, None])
         Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta1)) # PP fährt zur Abholposition
         
-        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "AS_Check", "AS_VacuumUnits", round(random.uniform(*(AS_Vacuum_error_range if random.random() <= fehlerRate else AS_Vacuum_ok_range)),2)])
+        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "AS_Check", "AS_VacuumUnits", round(random.uniform(*(AS_Vacuum_error_range if random.random() <= fehlerRate_AS_Vacuum else AS_Vacuum_ok_range)),2)])
         Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta2)) # Ausstechen und Pickup-Verzögerung
         
-        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Pick_Check", "PP_VacuumUnits", round(random.uniform(*(PP_Vacuum_error_range if random.random() <= fehlerRate else PP_Vacuum_ok_range)),2)])
-        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Pick_Check", "PP_Force", round(random.uniform(*(Pick_Force_error_range if random.random() <= fehlerRate else Pick_Force_ok_range)), 2)])
+        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Pick_Check", "PP_VacuumUnits", round(random.uniform(*(PP_Vacuum_error_range if random.random() <= fehlerRate_PP_Vacuum else PP_Vacuum_ok_range)),2)])
+        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Pick_Check", "PP_Force", round(random.uniform(*(Pick_Force_error_range if random.random() <= fehlerRate_Pick_Force else Pick_Force_ok_range)), 2)])
         Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta3)) # Maschinenverzögerung zw. Pickup und AS-BlowOff
         
-        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "AS_Blowoff_Check", "AS_VacuumUnits", round(random.uniform(*(AS_Blow_error_range if random.random() <= fehlerRate else AS_Blow_ok_range)), 2)])
+        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "AS_Blowoff_Check", "AS_VacuumUnits", round(random.uniform(*(AS_Blow_error_range if random.random() <= fehlerRate_AS_Blow else AS_Blow_ok_range)), 2)])
         Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta4)) # PP fährt zur Bestückposition
         
-        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Place_Check", "PP_Force", round(random.uniform(*(Place_Force_error_range if random.random() <= fehlerRate else Place_Force_ok_range)), 2)])
-        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Place_Check", "PP_VacuumUnits", round(random.uniform(*(PP_Blow_error_range if random.random() <= fehlerRate else PP_Blow_ok_range)), 2)])
+        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Place_Check", "PP_Force", round(random.uniform(*(Place_Force_error_range if random.random() <= fehlerRate_Place_Force else Place_Force_ok_range)), 2)])
+        writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Place_Check", "PP_VacuumUnits", round(random.uniform(*(PP_Blow_error_range if random.random() <= fehlerRate_PP_Blow else PP_Blow_ok_range)), 2)])
         Simulationszeit_aktuell += timedelta(milliseconds=random.uniform(*delta5)) # Bauteilsuche/Fahrt zur Warteposition
         
         writer.writerow([Simulationszeit_aktuell.isoformat(timespec='milliseconds').replace('+00:00', 'Z'), MACHINE_ID, "Cycle_End", None, None])

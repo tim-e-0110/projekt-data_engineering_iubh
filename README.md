@@ -32,10 +32,13 @@ Die Architektur basiert auf einem Microservice-Ansatz und wird lokal mit Docker 
 
 1.  **Datenquelle (Simulation):** Ein Python-Skript (`generate_data.py`) simuliert einen vorgeschalteten Datenerfassungsprozess (z.B. TotalFabMonitoring). Es erzeugt **tägliche CSV-Dateien** (`machine_event_logs_...csv`) mit Event-Daten im "langen" Format (> 1 Mio. Zeilen pro Tag), die im Verzeichnis `./raw_data` abgelegt für den Spark-Job per Bind Mount bereitgestellt werden.
 2.  **Verarbeitungs-Service (`daily_aggregator_service`):** Ein Docker-Container (definiert in `Dockerfile`), der einen **PySpark**-Job (`src/daily_aggregator.py`) ausführt. Dieser Job wird typischerweise täglich (manuell oder z.B. durch einen Cron-Job/Scheduler) gestartet, um die CSV-Datei des Vortages zu verarbeiten. Er liest die Daten, führt Transformationen durch (Timestamp-Konvertierung), reichert sie an (Generierung von `cycle_seq`, `is_error` basierend auf Schwellwerten, `cycle_time_seconds`) und speichert diese aufbereiteten Events in der Datenbank. Abschließend berechnet er stündliche Aggregate.
-3.  **Speicher-Service (`postgres_db`):** Ein Docker-Container mit einem **PostgreSQL**-Server. Speichert die Pipeline-Ergebnisse in zwei Tabellen:
+    *   Die aufbereiteten Events werden per `append` direkt in `processed_machine_events` geschrieben.
+    *   Die stündlichen Aggregate werden zunächst per `overwrite` in die Staging-Tabelle (`hourly_machine_summary_staging`) geschrieben.
+    *   Im Anschluss an die Spark-Verarbeitung führt das Skript einen SQL-Merge (`INSERT ... ON CONFLICT DO UPDATE`) via psycopg2 durch, um die Daten aus der Staging-Tabelle in die finale Zieltabelle (`hourly_machine_summary`) idempotent zu übertragen.
+3.  **Speicher-Service (`postgres_db`):** Ein Docker-Container mit einem **PostgreSQL**-Server. Das Schema wird automatisch beim ersten Start durch `src/init_db.sql` erstellt. Speichert die Pipeline-Ergebnisse in drei Tabellen:
     *   `processed_machine_events`: Angereicherte Einzel-Events (Schreibmodus: `append`).
-    *   `hourly_machine_summary`: Stündliche Aggregate (Schreibmodus: `append`).
-    Das Schema wird automatisch beim ersten Start durch `src/init_db.sql` erstellt.
+    *   `hourly_machine_summary_staging`: Temporärer Speicher für stündliche Aggregate des jeweils letzten Verarbeitungslaufs (Schreibmodus: `overwrite`).
+    *   `hourly_machine_summary`: Zieltabelle für die stündlichen Aggregate, historisch akkumuliert und idempotent aktualisiert (SQL-Merge `INSERT ... ON CONFLICT DO UPDATE`). Dient als Datenquelle für das Dashboard.
 4.  **Visualisierungs-Service (`dashboard_service`):** Ein Docker-Container (definiert in `Dockerfile_dash`), der eine **Streamlit**-Anwendung (`src/dashboard.py`) ausführt. Diese liest die aggregierten Daten (`hourly_machine_summary`) aus der PostgreSQL-Datenbank und stellt sie interaktiv im Webbrowser dar.
 
 ## Verwendete Technologien

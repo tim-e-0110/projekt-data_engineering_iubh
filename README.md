@@ -4,6 +4,23 @@ Dieses Repository enthält das Portfolio-Projekt für den IU Kurs "Projekt: Data
 Es implementiert eine **Batch-basierte Datenpipeline (Aufgabe 1)** zur Verarbeitung und Analyse von simulierten Maschinen-Event-Logs (z.B. Die-Bonder) aus der Halbleiterfertigung. 
 Die aufbereiteten Daten werden in einer PostgreSQL Datenbank gespeichert und für eine hypothetische ML-Anwendung bereitgestellt, sowie in einem einfachen Dashboard visualisiert.
 
+## Betrachteter Produktionsprozess
+
+es wird ein vereinfachter Produktionszyklus simuliert, der auf die folgenden Prozessschritte reduziert wurde:
+```
+| Vorgang                          | Maschinen-Event        | Messparameter                                                       |
+|----------------------------------|------------------------|-------------------------------------------------------------------  |
+| Zyklusstart                      | Cycle_Start            | –                                                                   |
+| Schritt 1: Vakuum prüfen (AS)    | AS_Check               | AS_VacuumUnits (niedriger Wert)                                     |
+| Schritt 2: Chip kontaktieren     | Pick_Check             | PP_VacuumUnits (niedriger Wert), PP_Force (definierter Wertebereich)|
+| Schritt 3: Chip ausstechen       | –                      | – (für diese Simulation nicht relevant)                             |
+| Schritt 4: Folie lösen (AS)      | AS_Blowoff_Check       | AS_VacuumUnits (hoher Wert)                                         |
+| Schritt 5: Chip platzieren       | Place_Check            | PP_Force (definierter Wertebereich)                                 |
+| Schritt 6: Vakuum lösen (PP)     | Place_Check            | PP_VacuumUnits (hoher Wert)                                         |
+| Zyklusende                       | Cycle_End              | –                                                                   |
+```
+
+
 ## Architekturübersicht
 
 Die Architektur basiert auf einem Microservice-Ansatz und wird lokal mit Docker Compose orchestriert.

@@ -73,7 +73,7 @@ Die Architektur basiert auf einem Microservice-Ansatz und wird lokal mit Docker 
     git clone https://github.com/tim-e-0110/projekt-data_engineering_iubh.git
     cd projekt-data_engineering_iubh
     ```
-2.  **JDBC Treiber:** Sicherstellen, dass die PostgreSQL JDBC `.jar`-Datei im Ordner `drivers/` vorhanden ist (siehe `Dockerfile`).
+2.  **JDBC Treiber:** Sicherstellen, dass die PostgreSQL JDBC Treiberdatei `postgresql-42.7.5.jar` im Ordner `drivers/` vorhanden ist (siehe `Dockerfile`).
 3.  **Credentials:** Erstelle eine Datei namens `.env` im Hauptverzeichnis mit folgendem Inhalt (ersetze die Werte):
     ```dotenv
     DB_USER=mein_benutzer

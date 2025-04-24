@@ -34,6 +34,8 @@ Die Architektur basiert auf einem Microservice-Ansatz und wird lokal mit Docker 
 
 ## Projektstruktur
 
+
+```
 .
 ├── config/
 │ └── schwellwerte.json # Konfiguration der Fehlerschwellwerte
@@ -56,7 +58,7 @@ Die Architektur basiert auf einem Microservice-Ansatz und wird lokal mit Docker 
 ├── README.md # Diese Datei
 ├── requirements.txt # Python-Abhängigkeiten für PySpark-Service
 └── requirements_dash.txt # Python-Abhängigkeiten für Dashboard-Service
-
+```
 
 ## Setup & Ausführung
 

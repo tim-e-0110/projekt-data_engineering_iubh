@@ -5,15 +5,16 @@ import random
 import csv
 import os
 
-MACHINE_ID = "DieBonder_01"
+
 SimDauer = 1*24    # Angabe in Stunden.
 
-if len(sys.argv) != 2:
-    print("Benutzung: python generate_data.py <Startdatum im Format YYYY-MM-DD>")
+if len(sys.argv) != 3:
+    print("Benutzung: python generate_data.py <Maschine_ID> <Startdatum im Format YYYY-MM-DD>")
     sys.exit(1)
 
-datum_input = sys.argv[1]
+datum_input = sys.argv[2]
 StartZeit_STR = datum_input + "T00:00"
+MACHINE_ID = sys.argv[1]
 
 try:
     dt_naive = datetime.datetime.strptime(StartZeit_STR, "%Y-%m-%dT%H:%M")
@@ -24,12 +25,12 @@ except ValueError:
 StartZeit = dt_naive.replace(second=0, microsecond=0, tzinfo=datetime.UTC)
 EndeZeit = StartZeit + datetime.timedelta(hours=SimDauer)
 
-fehlerRate_AS_Vacuum = 0.01
-fehlerRate_PP_Vacuum = 0.02
-fehlerRate_AS_Blow = 0.01
-fehlerRate_PP_Blow = 0.01
-fehlerRate_Pick_Force = 0.01
-fehlerRate_Place_Force = 0.01
+fehlerRate_AS_Vacuum = round(random.uniform(0, 0.03), 3)
+fehlerRate_PP_Vacuum = round(random.uniform(0, 0.03), 3)
+fehlerRate_AS_Blow = round(random.uniform(0, 0.03), 3)
+fehlerRate_PP_Blow = round(random.uniform(0, 0.03), 3)
+fehlerRate_Pick_Force = round(random.uniform(0, 0.03), 3)
+fehlerRate_Place_Force = round(random.uniform(0, 0.03), 3)
 
 AS_Vacuum_ok_range = (40.0,70.0)
 AS_Vacuum_error_range = (70.1, 100.0)

@@ -174,4 +174,4 @@ cython_debug/
 .pypirc
 
 rur.cmd
-src/dashboard_bk
+src/dashboard_bk.py
